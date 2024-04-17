@@ -1,12 +1,12 @@
-/* eslint-disable no-console */
-/* eslint-disable max-len */
-
-// 6. Make the calculator work! You’ll need to store the first number and second number that are input into the calculator,
-// utilize the operator that the user selects, and then operate() on the two numbers when the user presses the “=” key.
-//   - You should already have the code that can populate the display, so once operate() has been called,
-// update the display with the ‘solution’ to the operation.
+// 6. Make the calculator work! You’ll need to store the first number and second number
+// that are input into the calculator,
+// utilize the operator that the user selects, and then operate() on the two numbers
+// when the user presses the “=” key.
+//    - You should already have the code that can populate the display,
+//      so once operate() has been called, update the display with the ‘solution’ to the operation.
 //   - This is the hardest part of the project. You need to figure out how to store all the values
-// and call the operate function with them. Don’t feel bad if it takes you a while to figure out the logic.
+//      and call the operate function with them. Don’t feel bad
+// if it takes you a while to figure out the logic.
 
 let firstNum = '';
 let firstNumEntered = false;
@@ -43,10 +43,13 @@ const divide = (a, b) => a / b;
 const operate = (op, first, second) => {
   const a = +first;
   const b = +second;
-  if (op === '+') return add(a, b);
-  if (op === '-') return subtract(a, b);
-  if (op === '*') return multiply(a, b);
-  if (op === '/') return divide(a, b);
+  switch (op) {
+    case '+': return add(a, b);
+    case '-': return subtract(a, b);
+    case '*': return multiply(a, b);
+    case '/': return divide(a, b);
+    default: break;
+  }
   return 'ERR';
 };
 
@@ -84,16 +87,18 @@ const numPress = (e) => {
 };
 
 // LOGIC FOR OPS
-  // OPERATOR
-    // if firstNumEntered = false, set firstNum to display default (0) + firstNumEntered to true (0 * 3 = 0); set operator
-    // if firstNumEntered = true, set operator
-    // if secondNumEntered = true, perform operation as if = pressed; update firstNum to display; reset operator + secondNum
-  // AC => Reset everything
-  // EQUALS
-    // if all reset, do nothing | if only firstNum, do nothing
-    // if firstNum + operator set, assume firstNum = secondNum and perform operation
-    // if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
-  // FUNC SET READY STATE: display = firstNum, operator remains same; secondNum = empty
+//  (1) OPERATOR
+//    if firstNumEntered = false,
+//      set firstNum to display default (0) + firstNumEntered to true (0 * 3 = 0); set operator
+//    if firstNumEntered = true, set operator
+//    if secondNumEntered = true,
+//      perform operation as if = pressed; update firstNum to display; reset operator + secondNum
+//  (2) AC => Reset everything
+//  (3) EQUALS
+//    if all reset, do nothing | if only firstNum, do nothing
+//    if firstNum + operator set, assume firstNum = secondNum and perform operation
+//    if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
+// FUNC SET READY STATE: display = firstNum, operator remains same; secondNum = empty
 
 const opPress = (e) => {
   const { id } = e.target;
@@ -124,14 +129,16 @@ const opPress = (e) => {
   }
 
   // OPERATIONS
-  // OPERATOR: if firstNumEntered = false, set firstNum to display default (0) + firstNumEntered to true (0 * 3 = 0); set operator
+  // OPERATOR: if firstNumEntered = false,
+  //  set firstNum to display default (0) + firstNumEntered to true (0 * 3 = 0); set operator
   if (firstNumEntered === false) {
     firstNum = displayValue;
     firstNumEntered = true;
     operator = id;
     return;
   }
-  // OPERATOR: if secondNumEntered = true, perform operation as if = pressed; update firstNum to display; reset operator + secondNum
+  // OPERATOR: if secondNumEntered = true,
+  //  perform operation as if = pressed; update firstNum to display; reset operator + secondNum
   if (firstNumEntered === true && secondNumEntered === true) {
     if (operator !== id) {
       operator = id;
