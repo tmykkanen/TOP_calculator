@@ -8,10 +8,10 @@
 //      and call the operate function with them. Don’t feel bad
 // if it takes you a while to figure out the logic.
 
-let firstNum = '';
+let firstNum;
 let firstNumEntered = false;
 let secondNumEntered = false;
-let secondNum = '';
+let secondNum;
 let operator = '';
 let displayValue = 0;
 
@@ -25,8 +25,8 @@ const updateDisplay = () => {
 };
 
 const resetCalc = () => {
-  firstNum = '';
-  secondNum = '';
+  firstNum = null;
+  secondNum = null;
   operator = '';
   firstNumEntered = false;
   secondNumEntered = false;
@@ -110,21 +110,29 @@ const opPress = (e) => {
   }
 
   // EQUALS
+  // if (id === '=') {
+  //   // if all reset, do nothing | if only firstNum, do nothing
+  //   if (firstNumEntered === false || (firstNumEntered === true && operator === '')) {
+  //     return;
+  //   }
+  //   // if firstNum + operator set, assume firstNum = secondNum and perform operation
+  //   if (secondNumEntered === false) {
+  //     secondNum = firstNum;
+  //     secondNumEntered = true;
+  //   }
+  //   displayValue = operate(operator, firstNum, secondNum);
+  //   // if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
+  //   // op * | first 35 | second 5
+  //   firstNum = displayValue;
+  //   updateDisplay();
+  //   return;
+  // }
+
   if (id === '=') {
-    // if all reset, do nothing | if only firstNum, do nothing
-    if (firstNumEntered === false || (firstNumEntered === true && operator === '')) {
-      return;
+    if ((firstNum != null) && (secondNum != null)) {
+      console.log('Both set!');
     }
-    // if firstNum + operator set, assume firstNum = secondNum and perform operation
-    if (secondNumEntered === false) {
-      secondNum = firstNum;
-      secondNumEntered = true;
-    }
-    displayValue = operate(operator, firstNum, secondNum);
-    // if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
-    // op * | first 35 | second 5
-    firstNum = displayValue;
-    updateDisplay();
+    // if all reset or only firstNum, do nothing
     return;
   }
 
