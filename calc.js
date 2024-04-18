@@ -102,6 +102,7 @@ const opPress = (a) => {
     operation,
     opPressed,
     displayValue,
+    lastOp,
   } = a;
   // *** TESTING
 
@@ -109,16 +110,35 @@ const opPress = (a) => {
     return resetCalc();
   }
 
-  if (opPressed === '=' && secondNum == null) {
-    secondNum = firstNum;
-  }
-
   if (opPressed === '=') {
+    if (secondNum == null) {
+      if (lastOp.lastSecondNum != null) {
+        secondNum = lastOp.lastSecondNum;
+      } else {
+        secondNum = firstNum;
+      }
+    }
     displayValue = operate(firstNum, secondNum, operation);
     firstNum = displayValue;
-  }
+    lastOp.lastSecondNum = secondNum;
+    lastOp.lastOperation = operation;
+    secondNum = null;
+  } else {
+  // !ac && != && OP PRESSED
+    if (firstNum == null) {
+      firstNum = 0;
+    }
 
-  
+    if (secondNum != null) {
+      displayValue = operate(firstNum, secondNum, operation);
+      firstNum = displayValue;
+      lastOp.lastSecondNum = secondNum;
+      lastOp.lastOperation = operation;
+      secondNum = null;
+    }
+    console.log(`op pressed: ${opPressed}`);
+    operation = opPressed;
+  }
 
   // *** TESTING
   const results = {
@@ -127,6 +147,7 @@ const opPress = (a) => {
     operation,
     opPressed,
     displayValue,
+    lastOp,
   };
   return results;
   // *** TESTING

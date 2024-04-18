@@ -115,78 +115,213 @@ describe('Test numPress', () => {
 });
 
 describe('Test opPress', () => {
-  test('recognizes AC and properly clears calculator', () => {
-    const calcState = {
-      firstNum: null,
-      secondNum: null,
-      operation: null,
-      opPressed: 'ac',
-    };
-    const clear = opPress(calcState);
-    expect(clear.firstNum).toBe(null);
-    expect(clear.secondNum).toBe(null);
-    expect(clear.operator).toBe(null);
-    expect(clear.displayValue).toBe(0);
+  describe('Test AC', () => {
+    test('recognizes AC and properly clears calculator', () => {
+      const calcState = {
+        firstNum: null,
+        secondNum: null,
+        operation: null,
+        opPressed: 'ac',
+        displayValue: 0,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      const clear = opPress(calcState);
+      expect(clear.firstNum).toBe(null);
+      expect(clear.secondNum).toBe(null);
+      expect(clear.operator).toBe(null);
+      expect(clear.displayValue).toBe(0);
+    });
   });
-  test('perform operatons when equals is pressed with both numbers and operator set', () => {
-    const calcState = {
-      firstNum: '4',
-      secondNum: '2',
-      operation: '+',
-      opPressed: '=',
-      displayValue: '2',
-    };
-    expect(opPress(calcState).displayValue).toBe(6);
-    calcState.operation = '-';
-    expect(opPress(calcState).displayValue).toBe(2);
-    calcState.operation = '*';
-    expect(opPress(calcState).displayValue).toBe(8);
-    calcState.operation = '/';
-    expect(opPress(calcState).displayValue).toBe(2);
+  describe('Test Equals', () => {
+    test('perform operatons when equals is pressed with both numbers and operator set', () => {
+      const calcState = {
+        firstNum: '4',
+        secondNum: '2',
+        operation: '+',
+        opPressed: '=',
+        displayValue: 2,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).displayValue).toBe(6);
+      calcState.operation = '-';
+      expect(opPress(calcState).displayValue).toBe(2);
+      calcState.operation = '*';
+      expect(opPress(calcState).displayValue).toBe(8);
+      calcState.operation = '/';
+      expect(opPress(calcState).displayValue).toBe(2);
+    });
+    test('perform operatons when equals is pressed with first number and operator set', () => {
+      const calcState = {
+        firstNum: '10',
+        secondNum: null,
+        operation: '+',
+        opPressed: '=',
+        displayValue: 10,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).displayValue).toBe(20);
+      calcState.operation = '-';
+      expect(opPress(calcState).displayValue).toBe(0);
+      calcState.operation = '*';
+      expect(opPress(calcState).displayValue).toBe(100);
+      calcState.operation = '/';
+      expect(opPress(calcState).displayValue).toBe(1);
+    });
+    test('after op, set displayValue to firstNum, keep operation, and set secondNum to null', () => {
+      const calcState = {
+        firstNum: '10',
+        secondNum: '2',
+        operation: '+',
+        opPressed: '=',
+        displayValue: 2,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).firstNum).toBe(12);
+      expect(opPress(calcState).operation).toBe('+');
+      expect(opPress(calcState).secondNum).toBe(null);
+    });
+    test('equals pressed multiple times in a row', () => {
+      const calcState = {
+        firstNum: '10',
+        secondNum: '2',
+        operation: '+',
+        opPressed: '=',
+        displayValue: 2,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      const calcStateTwo = opPress(calcState);
+      expect(opPress(calcStateTwo).displayValue).toBe(14);
+      expect(opPress(opPress(calcStateTwo)).displayValue).toBe(16);
+    });
   });
-  test('perform operatons when equals is pressed with first number and operator set', () => {
-    const calcState = {
-      firstNum: '10',
-      secondNum: null,
-      operation: '+',
-      opPressed: '=',
-      displayValue: '10',
-    };
-    expect(opPress(calcState).displayValue).toBe(20);
-    calcState.operation = '-';
-    expect(opPress(calcState).displayValue).toBe(0);
-    calcState.operation = '*';
-    expect(opPress(calcState).displayValue).toBe(100);
-    calcState.operation = '/';
-    expect(opPress(calcState).displayValue).toBe(1);
-  });
-  test('after op, set displayValue to firstNum, keep operation, and set secondNum to null', () => {
-    const calcState = {
-      firstNum: '10',
-      secondNum: '2',
-      operation: '+',
-      opPressed: '=',
-      displayValue: '2',
-    };
-    expect(opPress(calcState).firstNum).toBe(12);
-    expect(opPress(calcState).operation).toBe('+');
-  });
-  test('equals pressed multiple times in a row', () => {
-    const calcState = {
-      firstNum: '10',
-      secondNum: '2',
-      operation: '+',
-      opPressed: '=',
-      displayValue: '2',
-    };
-    const calcStateTwo = opPress(calcState);
-    expect(opPress(calcStateTwo).displayValue).toBe(14);
-    expect(opPress(opPress(calcStateTwo)).displayValue).toBe(16);
+  describe('Test Operations', () => {
+    test('firstNum not entered, assumes zero for value', () => {
+      const calcState = {
+        firstNum: null,
+        secondNum: null,
+        operation: null,
+        opPressed: '+',
+        displayValue: 0,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).firstNum).toBe(0);
+      expect(opPress(calcState).operation).toBe('+');
+      expect(opPress(calcState).displayValue).toBe(0);
+    });
+    test('firstNum entered, normal behavior', () => {
+      const calcState = {
+        firstNum: '12',
+        secondNum: null,
+        operation: null,
+        opPressed: '+',
+        displayValue: 12,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).firstNum).toBe('12');
+      expect(opPress(calcState).operation).toBe('+');
+      expect(opPress(calcState).displayValue).toBe(12);
+    });
+    test('operator pressed after second numer entered, operate as =', () => {
+      const calcState = {
+        firstNum: '12',
+        secondNum: '13',
+        operation: '*',
+        opPressed: '+',
+        displayValue: 13,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).displayValue).toBe(156);
+      expect(opPress(calcState).firstNum).toBe(156);
+      expect(opPress(calcState).operation).toBe('+');
+      expect(opPress(calcState).secondNum).toBe(null);
+    });
+    test('multiple presses of same operator set firstNum to zero after AC', () => {
+      const calcState = {
+        firstNum: null,
+        secondNum: null,
+        operation: null,
+        opPressed: '+',
+        displayValue: 0,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      const firstPress = opPress(calcState);
+      expect(firstPress.displayValue).toBe(0);
+      expect(firstPress.operation).toBe('+');
+      expect(firstPress.firstNum).toBe(0);
+      const secondPress = opPress(firstPress);
+      expect(secondPress.displayValue).toBe(0);
+      expect(secondPress.operation).toBe('+');
+      expect(secondPress.firstNum).toBe(0);
+    });
+    test('multiple presses of same operator do nothing after firstNum is set', () => {
+      const calcState = {
+        firstNum: '12',
+        secondNum: null,
+        operation: null,
+        opPressed: '+',
+        displayValue: 12,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      const firstPress = opPress(calcState);
+      expect(firstPress.displayValue).toBe(12);
+      expect(firstPress.operation).toBe('+');
+      expect(firstPress.firstNum).toBe('12');
+      const secondPress = opPress(firstPress);
+      expect(secondPress.displayValue).toBe(12);
+      expect(secondPress.operation).toBe('+');
+      expect(secondPress.firstNum).toBe('12');
+    });
+    test('pressing different operator changes operation', () => {
+      const calcState = {
+        firstNum: '12',
+        secondNum: null,
+        operation: null,
+        opPressed: '+',
+        displayValue: 12,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      const firstPress = opPress(calcState);
+      expect(firstPress.displayValue).toBe(12);
+      expect(firstPress.operation).toBe('+');
+      expect(firstPress.firstNum).toBe('12');
+      firstPress.opPressed = '-';
+      const secondPress = opPress(firstPress);
+      expect(secondPress.displayValue).toBe(12);
+      expect(secondPress.operation).toBe('-');
+      expect(secondPress.firstNum).toBe('12');
+    });
   });
 });
-
-//  (3) EQUALS
-//    if all reset, do nothing | if only firstNum, do nothing
-//    if firstNum + operator set, assume firstNum = secondNum and perform operation
-// After op
-// if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
