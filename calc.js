@@ -88,7 +88,7 @@ const resetCalc = () => {
   const reset = {
     firstNum: null,
     secondNum: null,
-    operator: null,
+    operation: null,
     displayValue: 0,
   };
   return reset;
@@ -108,6 +108,10 @@ const opPress = (a) => {
 
   if (opPressed === 'ac') {
     return resetCalc();
+  }
+
+  if (opPressed === '=' && operation == null) {
+    return a;
   }
 
   if (opPressed === '=') {

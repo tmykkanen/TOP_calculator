@@ -1,35 +1,35 @@
-// 6. Make the calculator work! You’ll need to store the first number and second number
-// that are input into the calculator,
-// utilize the operator that the user selects, and then operate() on the two numbers
-// when the user presses the “=” key.
-//    - You should already have the code that can populate the display,
-//      so once operate() has been called, update the display with the ‘solution’ to the operation.
-//   - This is the hardest part of the project. You need to figure out how to store all the values
-//      and call the operate function with them. Don’t feel bad
-// if it takes you a while to figure out the logic.
+const calcState = {
+  firstNum: null,
+  secondNum: null,
+  operation: null,
+  displayValue: 0,
+  lastOp: {
+    lastSecondNum: null,
+    lastOperation: null,
+  },
+};
 
-let firstNum;
-let firstNumEntered = false;
-let secondNumEntered = false;
-let secondNum;
-let operator = '';
-let displayValue = 0;
+let {
+  firstNum,
+  secondNum,
+  operation,
+  displayValue,
+  lastOp,
+} = calcState;
 
 const numPad = document.querySelector('#numPad');
 const operators = document.querySelector('#opPad');
-// const numKeys = Array.from(numPad.querySelectorAll('button'));
 const display = document.querySelector('#display');
 
 const updateDisplay = () => {
+  // TODO: Move logic for updating display here.
   display.textContent = displayValue;
 };
 
 const resetCalc = () => {
   firstNum = null;
   secondNum = null;
-  operator = '';
-  firstNumEntered = false;
-  secondNumEntered = false;
+  operation = null;
   displayValue = 0;
   updateDisplay();
 };
@@ -40,7 +40,7 @@ const subtract = (a, b) => a - b;
 const multiply = (a, b) => a * b;
 const divide = (a, b) => a / b;
 
-const operate = (op, first, second) => {
+const operate = (first, second, op) => {
   const a = +first;
   const b = +second;
   switch (op) {
@@ -55,112 +55,69 @@ const operate = (op, first, second) => {
 
 const numPress = (e) => {
   // TODO: Fix misclick causing "numpad" to return.
-  // LOGIC FOR NUMPAD
-  const { id } = e.target;
+  const numPressed = e.target.id;
 
-  // // after AC, firstNumEntered = false => firstNum = id
-  if (firstNumEntered === false) {
-    firstNum = id;
-    firstNumEntered = true;
+  if (firstNum == null) {
+    // firstNum empty
+    firstNum = numPressed;
     displayValue = firstNum;
-    return;
-  }
-
-  // firstNumEnetered = true => firstNum += id
-  if (firstNumEntered === true && operator === '') {
-    firstNum += id;
+  } else if (operation == null) {
+    // add to existing firstNum
+    firstNum += numPressed;
     displayValue = firstNum;
-    return;
-  }
-
-  // operator entered => secondNum += id
-  if (firstNumEntered === true && operator !== '') {
-    if (secondNumEntered === false) {
-      secondNum = id;
-      secondNumEntered = true;
-      displayValue = secondNum;
-      return;
-    }
-    secondNum += id;
+  } else if (secondNum == null) {
+    // secondNum empty
+    secondNum = numPressed;
+    displayValue = secondNum;
+  } else {
+    // add to existing secondNum
+    secondNum += numPressed;
     displayValue = secondNum;
   }
 };
 
-// LOGIC FOR OPS
-//  (1) OPERATOR
-//    if firstNumEntered = false,
-//      set firstNum to display default (0) + firstNumEntered to true (0 * 3 = 0); set operator
-//    if firstNumEntered = true, set operator
-//    if secondNumEntered = true,
-//      perform operation as if = pressed; update firstNum to display; reset operator + secondNum
-//  (2) AC => Reset everything
-//  (3) EQUALS
-//    if all reset, do nothing | if only firstNum, do nothing
-//    if firstNum + operator set, assume firstNum = secondNum and perform operation
-//    if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
-// FUNC SET READY STATE: display = firstNum, operator remains same; secondNum = empty
-
 const opPress = (e) => {
-  const { id } = e.target;
+  const opPressed = e.target.id;
 
-  // CLEAR
-  if (id === 'ac') {
+  // AC
+  if (opPressed === 'ac') {
     resetCalc();
     return;
   }
 
   // EQUALS
-  // if (id === '=') {
-  //   // if all reset, do nothing | if only firstNum, do nothing
-  //   if (firstNumEntered === false || (firstNumEntered === true && operator === '')) {
-  //     return;
-  //   }
-  //   // if firstNum + operator set, assume firstNum = secondNum and perform operation
-  //   if (secondNumEntered === false) {
-  //     secondNum = firstNum;
-  //     secondNumEntered = true;
-  //   }
-  //   displayValue = operate(operator, firstNum, secondNum);
-  //   // if operator set and equals set, do op again (e.g. 7 * 5 = 35 = 175 (35 * 5))
-  //   // op * | first 35 | second 5
-  //   firstNum = displayValue;
-  //   updateDisplay();
-  //   return;
-  // }
-
-  if (id === '=') {
-    if ((firstNum != null) && (secondNum != null)) {
-      console.log('Both set!');
-    }
-    // if all reset or only firstNum, do nothing
+  if (opPressed === '=' && operation == null) {
     return;
   }
 
-  // OPERATIONS
-  // OPERATOR: if firstNumEntered = false,
-  //  set firstNum to display default (0) + firstNumEntered to true (0 * 3 = 0); set operator
-  if (firstNumEntered === false) {
-    firstNum = displayValue;
-    firstNumEntered = true;
-    operator = id;
-    return;
-  }
-  // OPERATOR: if secondNumEntered = true,
-  //  perform operation as if = pressed; update firstNum to display; reset operator + secondNum
-  if (firstNumEntered === true && secondNumEntered === true) {
-    if (operator !== id) {
-      operator = id;
-      secondNum = '';
-      secondNumEntered = false;
-      return;
+  if (opPressed === '=') {
+    if (secondNum == null) {
+      if (lastOp.lastSecondNum != null) {
+        secondNum = lastOp.lastSecondNum;
+      } else {
+        secondNum = firstNum;
+      }
     }
-    displayValue = operate(operator, firstNum, secondNum);
+    displayValue = operate(firstNum, secondNum, operation);
     firstNum = displayValue;
-    updateDisplay();
-    return;
+    lastOp.lastSecondNum = secondNum;
+    lastOp.lastOperation = operation;
+    secondNum = null;
+  } else {
+    // MATH OPS
+    if (firstNum == null) {
+      firstNum = 0;
+    }
+
+    if (secondNum != null) {
+      displayValue = operate(firstNum, secondNum, operation);
+      firstNum = displayValue;
+      lastOp.lastSecondNum = secondNum;
+      lastOp.lastOperation = operation;
+      secondNum = null;
+    }
+    operation = opPressed;
   }
-  // OPERATOR: if firstNumEntered = true + second = false, set operator
-  operator = id;
 };
 
 numPad.addEventListener('click', (e) => {
@@ -169,11 +126,5 @@ numPad.addEventListener('click', (e) => {
 });
 operators.addEventListener('click', (e) => {
   opPress(e);
+  updateDisplay();
 });
-
-// TESTS
-// console.log(`sub 7 - 2: ${operate('-', 7, 2)}`);
-// console.log(`add 3 + 4: ${operate('+', 3, 4)}`);
-// console.log(`mult 7 * 2: ${operate('*', 7, 2)}`);
-// console.log(`div 21 * 3: ${operate('/', 21, 3)}`);
-// console.log(`err: ${operate('t', 21, 3)}`);

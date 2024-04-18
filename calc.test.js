@@ -131,11 +131,28 @@ describe('Test opPress', () => {
       const clear = opPress(calcState);
       expect(clear.firstNum).toBe(null);
       expect(clear.secondNum).toBe(null);
-      expect(clear.operator).toBe(null);
+      expect(clear.operation).toBe(null);
       expect(clear.displayValue).toBe(0);
     });
   });
   describe('Test Equals', () => {
+    test('do nothing when no operator set', () => {
+      const calcState = {
+        firstNum: null,
+        secondNum: null,
+        operation: null,
+        opPressed: '=',
+        displayValue: 0,
+        lastOp: {
+          lastSecondNum: null,
+          lastOperation: null,
+        },
+      };
+      expect(opPress(calcState).displayValue).toBe(0);
+      calcState.firstNum = '12';
+      calcState.displayValue = 12;
+      expect(opPress(calcState).displayValue).toBe(12);
+    });
     test('perform operatons when equals is pressed with both numbers and operator set', () => {
       const calcState = {
         firstNum: '4',
